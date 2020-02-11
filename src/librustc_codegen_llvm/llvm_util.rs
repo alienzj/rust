@@ -108,6 +108,12 @@ unsafe fn configure_llvm(sess: &Session) {
         // during inlining. Unfortunately these may block other optimizations.
         add("-preserve-alignment-assumptions-during-inlining=false", false);
 
+        // MemorySSA in loop optimizations is enabled by default in LLVM 10,
+        // but causes a significant compile-time regression. Disable it.
+        if get_major_version() >= 10 {
+            add("-enable-mssa-loop-dependency=0", false);
+        }
+
         for arg in sess_args {
             add(&(*arg), true);
         }
